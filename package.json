@@ -1,0 +1,24 @@
+{
+  "name": "webapp",
+  "version": "1.0.0",
+  "description": "1.基于react 2.基于淘宝flexbile解决各端下的适配问题",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weizongqi1990/weizongqi-webapp.git"
+  },
+  "keywords": [
+    "webapp",
+    "react",
+    "koa.js"
+  ],
+  "author": "weiqi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/weizongqi1990/weizongqi-webapp/issues"
+  },
+  "homepage": "https://github.com/weizongqi1990/weizongqi-webapp#readme"
+}
