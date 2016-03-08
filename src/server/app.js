@@ -1,21 +1,17 @@
 'use strict';
-let app = require('koa')();
 
+let app = require('koa')()
 
-module.exports = (callback) => {
-    app.use(async (next) => {
-        let start = new Date()
+app.use( function *(next){
+    let strat = new Date()
+    yield next
+    let ms = new Date - strat
 
-        await next
+    console.log('%s %s - %s', this.method, this.url, ms);
+})
 
-        let ms = new Date() - start
+app.use( function *(){
+    this.body = 'Hello World9999'
+})
 
-        console.log('%s %s - %s', this.method, this.url, ms);
-    });
-
-    app.use(async (next) => {
-        this.body = 'Hello World';
-    });
-
-    app.listen(3000);
-}
+app.listen(3030);
