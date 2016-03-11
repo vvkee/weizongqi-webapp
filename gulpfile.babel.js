@@ -1,65 +1,69 @@
 'use strict';
 import        gulp from 'gulp'
+import     webpack from 'webpack'
+
 import         del from 'del'
 import       gutil from 'gulp-util'
-import      jshint from 'gulp-jshint'
+import      rename from 'gulp-rename'
 import     nodemon from 'gulp-nodemon'
 import runSequence from 'gulp-sequence'
+
+import      jshint from 'gulp-jshint'
+import      uglify from 'gulp-uglify'
+import      concat from 'gulp-concat'
+
+import webpackConfig from './webpack.config'
 
 const server = process.cwd() + '/src/server'
 const client = process.cwd() + '/src/client'
 const assets = process.cwd() + '/assets'
 
-gulp.task('default', (cb) => {
-    runSequence('server_clean', 'server_copy', 'server', 'server_watch', cb)
-})
+import task from './task'
+
 
 /**
- * server删除
- * @param  {[type]} 'server_clean' [description]
- * @param  {[type]} (              [description]
- * @return {[type]}                [description]
+ * 默认命令
+ * @param  {[type]} 'default' [description]
+ * @param  {[type]} (cb       [description]
+ * @return {[type]}           [description]
  */
-gulp.task('server_clean', () => {
-    del([assets + '/server/**/*'])
+gulp.task('dev', (cb) => {
+    runSequence(['server_dev', 'client_dev'], cb)
 })
 
-/**
- * server复制
- * @param  {[type]} 'server_copy' [description]
- * @param  {[type]} (             [description]
- * @return {[type]}               [description]
- */
-gulp.task('server_copy', () => {
-    return gulp.src(server + '/*.js')
-               .pipe(jshint())
-               .pipe(gulp.dest(assets + '/server'))
+
+// 后端任务（开发）
+task.serverDev({
+       gulp: gulp,
+    pluging: {
+                del: del,
+             jshint: jshint,
+            nodemon: nodemon,
+        runSequence: runSequence
+    },
+       path: {
+           server: server,
+           client: client,
+           assets: assets
+       }
 })
 
-/**
- * 启动服务器
- * @param  {[type]} 'server' [description]
- * @param  {[type]} (        [description]
- * @return {[type]}          [description]
- */
-gulp.task('server', () => {
-    return nodemon({
-        script: assets + '/server/app.js',
-        ignore: ['src/**', './*'],
-           env: {'NODE_ENV': 'development'}
-    })
-})
-
-gulp.task('server_reload', (cb) => {
-    runSequence('server_copy', 'server', cb)
-})
-
-/**
- * 监听server
- * @param  {[type]} 'server_watch' [description]
- * @param  {[type]} (              [description]
- * @return {[type]}                [description]
- */
-gulp.task('server_watch', () => {
-    gulp.watch(server + '/**/*', ['server_copy'])
+// 前端任务（开发）
+task.clientDev({
+       gulp: gulp,
+    pluging: {
+                del: del,
+              gutil: gutil,
+             rename: rename,
+            webpack: webpack,
+        runSequence: runSequence
+    },
+       path: {
+           server: server,
+           client: client,
+           assets: assets
+       },
+     config: {
+         webpackConfig: webpackConfig
+     }
 })

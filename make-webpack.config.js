@@ -12,25 +12,26 @@ let ExtractTextPlugin = require('extract-text-webpack-plugin'),
 let     UglifyJsPlugin = webpack.optimize.UglifyJsPlugin,
     CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 
-let      srcDir = path.resolve(process.cwd(), 'src'),
+let      srcDir = path.resolve(process.cwd(), 'src/client'),
     nodeModPath = path.resolve(__dirname, './node_modules'),
-         assets = 'assets/',
-        pathMap = require('./src/pathmap.json')
+         assets = 'assets/'
+        // pathMap = require('./src/pathmap.json')
 
 let entries = (() => {
-    let jsDir = path.resolve(srcDir, 'js')
-    let entryFiles = glob.sync(jsDir + '/*.{js,jsx}')
+    let jsDir = path.resolve(srcDir, '')
+    let entryFiles = glob.sync(jsDir + '/**/widget/**/*.{js,jsx}')
     let map = {}
-
-    console.log('entryFiles', entryFiles)
 
     entryFiles.forEach((filePath) => {
         let filename = filePath.substring(filePath.lastIndexOf('\/') + 1, filePath.lastIndexOf('.'))
         map[filename] = filePath
     })
 
+
     return map;
-}())
+})()
+
+console.log('entries', entries);
 let chunks = Object.keys(entries)
 
 module.exports = (options) => {
@@ -43,29 +44,27 @@ module.exports = (options) => {
     // generate entry html files
     // 自动生成入口文件，入口js名必须和入口文件名相同
     // 例如，a页的入口文件是a.html，那么在js目录下必须有一个a.js作为入口文件
-    let plugins = () => {
-        let entryHtml = glob.sync(srcDir + '/*.html')
+    let plugins = (() => {
+        let entryHtml = glob.sync(srcDir + '/**/widget/**/*.html')
         let r = []
 
         entryHtml.forEach((filePath) => {
             let filename = filePath.substring(filePath.lastIndexOf('\/') + 1, filePath.lastIndexOf('.'))
+            let file_path = filePath.substring(filePath.lastIndexOf('\/widget') + 1, filePath.lastIndexOf('.'))
             let conf = {
                 template: filePath,
-                filename: filename + '.html'
+                filename: '../views/' + file_path + '.html'
             }
 
             if(filename in entries) {
-                conf.inject = 'body'
-                conf.chunks = ['vender', 'common', filename]
+                conf.chunks = ['vender', filename]
             }
-
-            if(/b|c/.test(filename)) conf.chunks.splice(2, 0, 'common-b-c')
 
             r.push(new HtmlWebpackPlugin(conf))
         })
 
         return r
-    }()
+    })()
 
     if(debug) {
         // 开发阶段，css直接内嵌
@@ -89,12 +88,16 @@ module.exports = (options) => {
         plugins.push(new UglifyJsPlugin())
     }
 
+    console.log('assign', Object.assign(entries, {
+        'vender': ['react', 'react-dom']
+    }))
     let config = {
         entry: Object.assign(entries, {
-            // 'vender': ['zepto']
+            'vender': ['react', 'react-dom']
         }),
+        devtool: 'source-map',
         output: {
-            path: path.resolve(assets),
+            path: path.resolve(assets + 'public'),
             filename: debug ? '[name].js' : 'js/[chunkhash:8].[name].min.js',
             chunkFilename: debug ? '[chunkhash:8].chunk.js' : 'js/[chunkhash:8].chunk.min.js',
             hotUpdateChunkFilename: debug ? '[id].js' : 'js/[id].[chunkhash:8].min.js',
@@ -102,8 +105,7 @@ module.exports = (options) => {
         },
         resolve: {
             root: [srcDir, './node_modules'],
-            alias: pathMap,
-            extensions: ['', '.js', '.css', '.scss', '.tpl', '.png', '.jpg']
+            extensions: ['', '.js','.jsx', '.css', '.scss', '.tpl', '.png', '.jpg']
         },
         resolveLoader: {
             root: path.join(__dirname, 'node_modules')
@@ -125,21 +127,13 @@ module.exports = (options) => {
                 { test: /\.css$/, loader: cssLoader},
                 { test: /\.scss$/, loader: scssLoader},
                 { test: /\.(woff|woff2|ttf|eot|svg|otf)(\?v=[0-9].[0-9].[0-9])?$/,   loader: "file"},
-                { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel?presets[]=react,presets[]=es2015'}
+                { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel?presets[]=react,presets[]=es2015,presets[]=stage-3'}
             ]
         },
         plugins: [
             new CommonsChunkPlugin({
-                name: 'common-b-c',
-                chunks: ['b', 'c']
-            }),
-            new CommonsChunkPlugin({
-                name: 'common',
-                chunks: ['common-b-c', 'a']
-            }),
-            new CommonsChunkPlugin({
                 name: 'vender',
-                chunks: ['common']
+                chunks: chunks
             })
         ].concat(plugins),
         devServer: {
@@ -156,31 +150,4 @@ module.exports = (options) => {
 
     return config
 
-    resolve: {
-        root: [process.cwd() + '/src', process.cwd() + '/node_modules'],
-        alias: {},
-        extensions: ['', '.js', '.css', '.scss', '.ejs', '.png', '.jpg']
-    },
-    entry: {
-        entry1: './entry/entry1.js',
-        entry2: './entry/entry2.js'
-    },
-    output: {
-        path: __dirname,
-        filename: '[name].entry.js'
-    },
-    resolve: {
-        extensions: ['', '.js', '.jsx']
-    },
-    module: {
-        loaders: [
-            { test: /\.js$/, loader: 'babel-loader' },
-            { test: /\.jsx$/, loader: 'babel-loader!jsx-loader?harmony' },
-            { test: /\.(jpe?g|png|gif)$/i, loader: 'url-loader?limit=8192'},
-            { test: /\.css$/, loader: 'style!css'},
-            { test: /\.scss$/, loader: 'style!css!scss'},
-            { test: /\.(woff|woff2|ttf|eot|svg|otf)(\?v=[0-9].[0-9].[0-9])?$/,   loader: "file"}
-        ]
-    },
-    plugins: [CommonsChunkPlugin]
-};
+}
