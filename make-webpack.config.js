@@ -87,20 +87,16 @@ module.exports = (options) => {
 
         plugins.push(new UglifyJsPlugin())
     }
-
-    console.log('assign', Object.assign(entries, {
-        'vender': ['react', 'react-dom']
-    }))
     let config = {
         entry: Object.assign(entries, {
-            'vender': ['react', 'react-dom']
+            'vender': ['react', 'react-dom', srcDir + '/common/static/style/base.scss', srcDir + '/common/static/style/reset.scss']
         }),
         devtool: 'source-map',
         output: {
             path: path.resolve(assets + 'public'),
-            filename: debug ? '[name].js' : 'js/[chunkhash:8].[name].min.js',
-            chunkFilename: debug ? '[chunkhash:8].chunk.js' : 'js/[chunkhash:8].chunk.min.js',
-            hotUpdateChunkFilename: debug ? '[id].js' : 'js/[id].[chunkhash:8].min.js',
+            filename: debug ? 'js/[name].js' : 'js/[chunkhash:8].[name].min.js',
+            chunkFilename: debug ? 'js/[chunkhash:8].chunk.js' : 'js/[chunkhash:8].chunk.min.js',
+            hotUpdateChunkFilename: debug ? 'js/[id].js' : 'js/[id].[chunkhash:8].min.js',
             publicPath: publicPath
         },
         resolve: {
@@ -126,7 +122,7 @@ module.exports = (options) => {
                 { test: /\.(tpl|ejs)$/, loader: 'ejs'},
                 { test: /\.css$/, loader: cssLoader},
                 { test: /\.scss$/, loader: scssLoader},
-                { test: /\.(woff|woff2|ttf|eot|svg|otf)(\?v=[0-9].[0-9].[0-9])?$/,   loader: "file"},
+                { test: /\.(woff|woff2|ttf|eot|svg|otf)(\?t=[0-9]*(\#[a-zA-Z]*)?)?$/,   loader: "file"},
                 { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel?presets[]=react,presets[]=es2015,presets[]=stage-3'}
             ]
         },

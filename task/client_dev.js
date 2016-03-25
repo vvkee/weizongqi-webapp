@@ -14,7 +14,7 @@ export default (_opt) => {
     const assets = _opt.path.assets
 
     gulp.task('client_dev', (cb) => {
-        runSequence('client_del', ['copy_html', 'webpack_dev'], 'client_watch', cb)
+        runSequence('client_del', ['copy_html', 'copy_img', 'webpack_dev'], 'client_watch', cb)
     });
 
     /**
@@ -40,7 +40,10 @@ export default (_opt) => {
      * @return {[type]}              [description]
      */
     gulp.task('client_del', () => {
-        del([assets + '/public/**/*'])
+        del([assets + '/public/img/**/*'])
+        del([assets + '/public/css/**/*'])
+        del([assets + '/public/js/**/*'])
+        del([assets + '/public/font/**/*'])
         del([assets + '/views/pages/**/*'])
     })
 
@@ -52,6 +55,14 @@ export default (_opt) => {
                    }))
                    .pipe(gulp.dest(assets + '/views/pages'))
     })
+    // html任务
+    gulp.task('copy_img', () => {
+        return gulp.src(client + '/**/static/image/**/*')
+                   .pipe(rename((file_path) => {
+                       file_path.dirname = file_path.dirname.replace(/\/static\/image/, '');
+                   }))
+                   .pipe(gulp.dest(assets + '/public/img'))
+    })
 
 
     gulp.task('client_watch', () => {
@@ -59,5 +70,6 @@ export default (_opt) => {
         gulp.watch(client + '/**/static/**/*', ['webpack_dev'])
         gulp.watch(client + '/**/widget/**/*', ['webpack_dev'])
         gulp.watch(client + '/**/module/**/*', ['webpack_dev'])
+        gulp.watch(client + '/**/static/image/**/*', ['copy_img'])
     })
 }

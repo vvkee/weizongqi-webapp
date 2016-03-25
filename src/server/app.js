@@ -7,6 +7,8 @@ import ejs from 'koa-ejs'
 import koaStatic from 'koa-static'
 import convert from 'koa-convert'
 import path from 'path'
+import compress from 'koa-compress'
+import zlib from 'zlib'
 
 import config from './config'
 
@@ -36,6 +38,8 @@ app.use(async (ctx, next) => {
 })
 // 使用日志中间件
 app.use(convert(logger()))
+// compress中间件,压缩静态文件
+app.use(compress())
 
 // 路由中间件
 app

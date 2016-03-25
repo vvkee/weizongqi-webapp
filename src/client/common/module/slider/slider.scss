@@ -1,0 +1,136 @@
+.slider {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    .slider-wrap {
+        position: relative;
+        z-index: 1;
+        li {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            z-index: 1;
+            overflow: hidden;
+            transition-property: opacity, transform;
+            transition-duration: 1.5s;
+            transition-delay: 0s;
+            transition-timing-function: ease-out;
+            img {
+                display: block;
+                max-width: 100%;
+                width: 100%;
+                transition-property: transform;
+                transition-duration: 1.5s;
+                transition-delay: 0s;
+                transition-timing-function: ease-out;
+                transform: scaleX(1.1) scaleY(1.1);
+            }
+            &.active {
+                opacity: 1;
+                z-index: 10;
+
+                img {
+                    transform: scaleX(1) scaleY(1);
+                }
+            }
+        }
+    }
+    h2 {
+        position: absolute;
+        height: 1rem;
+        line-height: 1rem;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.6);
+        bottom: 0;
+        width: 100%;
+        .slider_title {
+            display: block;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            color: #fff;
+        }
+    }
+    .slider_length {
+        position: absolute;
+        height: 1rem;
+        line-height: 1rem;
+        z-index: 11;
+        color: #fff;
+        bottom: 0;
+        right: 0.5rem;
+        font-style: italic;
+    }
+    .slider-dot-wrap {
+        position: absolute;
+        bottom: 0.1rem;
+        right: 0.1rem;
+        height: 0.8rem;
+        line-height: 0.8rem;
+        z-index: 20;
+        li {
+            float: left;
+            color: #fff;
+            padding-left: 0.1rem;
+            padding-right: 0.1rem;
+            .iconfont {
+                font-size: 0.3rem;
+                opacity: 0.8;
+            }
+        }
+    }
+    .prevBtn {
+        position: absolute;
+        left: 0.1rem;
+        top: 50%;
+        margin-top: -0.5rem;
+        z-index: 20;
+        animation-name: fadeLeft;
+        animation-direction:alternate;
+        animation-duration: 0.8s;
+        animation-iteration-count: infinite;
+        text-decoration: none;
+        .iconfont {
+            font-size: 1rem;
+            color: #fff;
+        }
+    }
+    .nextBtn {
+        position: absolute;
+        right: 0.1rem;
+        top: 50%;
+        margin-top: -0.5rem;
+        z-index: 20;
+        animation-name: fadeRight;
+        animation-direction:alternate;
+        animation-duration: 0.8s;
+        animation-iteration-count: infinite;
+
+        .iconfont {
+            font-size: 1rem;
+            color: #fff;
+        }
+    }
+}
+
+@keyframes fadeLeft {
+    from {
+        opacity: 0.4;
+        left: 0.15rem;
+    }
+    to {
+        opacity: 0.8;
+        left: 0.1rem;
+    }
+}
+
+@keyframes fadeRight {
+    from {
+        opacity: 0.4;
+        right: 0.15rem;
+    }
+    to {
+        opacity: 0.8;
+        right: 0.1rem;
+    }
+}
